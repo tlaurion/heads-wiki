@@ -28,19 +28,26 @@ The palm rest trackpad ribbon cable needs to be disconnected. Flip up the retain
 There are two SPI flash chips hiding under the black plastic, labelled "SPI1" and "SPI2". The top one is 4MB and contains the BIOS and reset vector. The bottom one is 8MB and has the [Intel Management Engine (ME)](https://www.flashrom.org/ME) firmware, plus the flash descriptor.
 
 
-Using a chip clip and a [SPI programmer](https://trmm.net/SPI_Flash), dump the existing ROMs to files. Dump them again and compare the different dumps to be sure that were no errors. Maybe dump them both a third time, just to be safe.
+Using a chip clip and a [teensy SPI programmer](https://trmm.net/SPI) or a [ch431a SPI programmer](https://www.amazon.com/circuit-programming-EEPROM-Programmer-EZP2010/dp/B0744NLHQG), [dump the existing ROMs to files] (https://github.com/corna/me_cleaner/wiki/External-flashing). Dump them again and compare the different dumps to be sure that were no errors. Maybe dump them both a third time, just to be safe.
+
 
 ![Flashing x230 SPI flash](https://farm3.staticflickr.com/2889/33186538873_c1290ca6ec_z_d.jpg)
 
-Ok, now comes the time to write the 4MB `x230.coreboot.bin` file to SPI2 chip. With my programmer and minicom, I hit i to verify that the flash chip signature is correctly read a few times, and then send `u0 400000`↵ to initiate the upload. I then drop to a shell with Control-A J and finally send the file with `pv x230.rom > /dev/ttyACM0`↵. A minute later, I resume minicom and hit i again to check that the chip is still responding.
+Ok, now comes the time to write the 4MB [generated`x230.rom`](https://github.com/osresearch/heads-wiki/blob/master/Building.md) file to SPI2 chip. `MAKE SURE ALL POWER SOURCES ARE DICONNECTED`
 
-Move the clip to the SPI1 chip and flash the 8 MB `x230.me.bin` (TODO: document how to produce this with me cleaner -> [Clean the ME firmware](Clean-the-ME-firmware)). This time you'll send the command `u0 800000`↵. This will wipe out the official Intel firmware, leaving only a stub of it to bring up the Sandybridge CPU before shutting down the ME. As far as I can tell there are no ill effects other than an inability to power off the machine without using the power switch.
+With my teensy programmer and minicom, I hit i to verify that the flash chip signature is correctly read a few times, and then send `u0 400000`↵ to initiate the upload. I then drop to a shell with Control-A J and finally send the file with `pv x230.rom > /dev/ttyACM0`↵. A minute later, I resume minicom and hit i again to check that the chip is still responding.
+
+With a ch431 programmer, run `flashrom --programmer ch341a_spi -w /path/to/heads/build/x230-flash/x230-flash.rom`
+
+Move the clip to the SPI1 chip and flash the 8 MB [Cleaned ME firmware](Clean-the-ME-firmware)`x230.me.bin`.
+
+With the ch431 programmer, run `flashrom --programmer ch341a_spi -w /path/to/cleaned/me/x230.me.bin`
 
 Finally, remove the programmer, connect the power supply and try to reboot.
 
-If all goes well, you should see the keyboard LED flash, and within a second the Heads splash screen appear. It currently drops you immediately into the shell, since the boot script portion has not yet been implemented. If it doesn't work, well, sorry about that. Please let me know what the symptoms are or what happened during the flashing.
+If all goes well, you should see the keyboard LED flash, and within a second the Heads splash screen appear. 
 
-Congratulations! You now have a Coreboot + Heads Linux machine. Adding your own signing key, installing Qubes and configuring tpmtotp are the next steps and need to be written.
+Congratulations! You now have a Coreboot + Heads Linux machine. 
 
 Adding your PGP key
 ===
