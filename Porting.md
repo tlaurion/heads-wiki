@@ -22,6 +22,15 @@ make \
 	menuconfig
 ```
 
+* The same logic would apply with the linux config file.
+  
+```
+make \
+        -C build/linux-4.14.62 \
+        KCONFIG_CONFIG=../../config/linux-newarch.config \
+        menuconfig
+```
+
 * Run `make CONFIG=config/newarch-qubes.config` to setup the coreboot tree,
 using the new coreboot config file.  This will create the output directory
 `build/coreboot-4.5/newarch/`, and after a while, you should have `newarch.rom`
