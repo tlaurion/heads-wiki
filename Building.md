@@ -80,7 +80,7 @@ Generally, everything that is needed to flash the SPI flash of a board is a sing
 ```
 make BOARD=kgpe-d16
 ```
-will produce a build/kgpe-d16/kgpe-d6.rom
+will produce a build/kgpe-d16/kgpe-d16.rom
 
 ---
 Make for a specific configuration. 
