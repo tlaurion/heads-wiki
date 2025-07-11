@@ -173,7 +173,7 @@ If you have a *ThinkPad (xx30/xx20 flavors), proceed with caution.*
 Review whether the Intel Firmware Descriptor (IFD) and Intel Management Engine (ME) were unlocked from the [Recovery Shell]({{ site.baseurl }}/RecoveryShell) before proceeding.
 
 ```shell
-flashrom -p internal
+flashrom --programmer internal
 ```
 
 The two following situations must apply, which will define what to do next.
@@ -186,7 +186,7 @@ This is the expected output if the initial external flashing of the firmware unl
   - If you are presently on a Legacy board (If Heads boot screen is not showing Maximized):
     - You will have to manually call flashrom from the Recovery Console: 
       - `mount-usb`
-      - `flashrom -p internal -w /media/heads-hotp-maximized-version-gcommit.rom`
+      - `flashrom --programmer internal --write /media/heads-hotp-maximized-version-gcommit.rom`
     - ![InternalUpgradeToMaximizedROM](https://user-images.githubusercontent.com/827570/167729694-6ff8da60-986a-4ec3-9b2d-4fa94e42d3fa.jpeg)
 - If you are already running a Maximized board ROM, you can safely upgrade through Heads GUI keeping your current settings. 
 

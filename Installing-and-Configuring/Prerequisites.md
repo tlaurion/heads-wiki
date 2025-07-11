@@ -72,6 +72,28 @@ USB Security Dongles (aka security token aka smartcard)
 |Nitrokey|[Nitrokey 3](https://www.nitrokey.com/products/nitrokeys#comparison)|X|X|
 |Purism|[Librem Key](https://puri.sm/products/librem-key/)|X|X|
 
+## EC firmware & customizations 🔧
+
+The Embedded Controller (EC) is responsible for platform functions such as keyboard hotkeys, keyboard layout enforcement, battery/charging policies, thermal control and other low-level hardware behaviours. On most supported ThinkPad boards the EC can only be updated as part of the vendor (proprietary) BIOS update process, not by Coreboot/Heads. Because of that, **EC changes that you want applied before running Heads must be done from the vendor firmware prior to the initial Heads flash.**
+
+Common EC customizations and caveats:
+
+- **Keyboard mappings / key swaps** (for example, allowing an X220 keyboard layout on an X230). Newer vendor firmware versions may explicitly *prevent* some swaps (see linked projects below).
+- **OEM battery whitelisting** or battery policy changes that can prevent a machine from booting if an unexpected battery is present.
+- **Power, charging, or thermal behavior** changes that alter how the machine charges or responds to thermal events.
+
+Recommended workflow:
+
+1. If you **do not** need EC customizations: flash the latest vendor BIOS available for your platform first (this updates EC firmware to the latest vendor release), then proceed with SPI backups and Heads flashing. Upgrading to the latest OEM BIOS is the simplest way to ensure a supported EC state.
+2. If you **do** need EC customizations: perform those customizations using the vendor BIOS update package (or supported vendor tooling) prior to performing the initial Heads flash. Document the changes and test that the system boots normally under vendor firmware before proceeding.
+3. Always **back up** the current system state where possible (BIOS/EC images, SPI dumps) before making changes, and verify boot after each firmware update step.
+
+References / projects:
+
+- ThinkPad EC customization examples: https://github.com/hamishcoleman/thinkpad-ec (example: preventing keyboard swap on newer firmwares)
+
+**Note:** Heads/Coreboot will not modify an EC. If your board requires a non-default EC blob or a special build-time change to preserve hardware behavior, follow the board's build instructions and the `boards/<boardname>` documentation for how to include custom blobs during the build.
+
 Legacy vs Maximized boards
 ===
 Some history first on the historical x230-flash and x230 boards that initially created the Heads project.
@@ -92,7 +114,7 @@ The consequence of that is the appearance of Maximized boards the multiple xx20 
 
 The maximized boards were created to produce fully valid and complete images for those boards. Blobs download/cleaning scripts were created for xx20 and xx30 platforms, which download ME blobs from the manufacturer, remove all the nasty bits reducing ME used space to the minimal and put resulting blob where it is needed from coreboot configuration to be integrated in the final produced ROM. A valid IFD descriptor is provided under the blob directory to match reduced ME size, giving the freed space to the BIOS region. A generated GBE blob is also provided in tree, required to have a functional e1000e ethernet interface, with an important limitation to be known from Heads users: the MAC address of maximized boards is fixed to DE:AD:C0:FF:EE. That is not so important for the majority of us connecting through wifi nowadays. But if a lot of Heads machines are living on the same LAN, or if privacy is needed through Ethernet connection, NetworkManager or other manual configuration will need to be applied to randomize/fixate Ethernet MAC address to desired value prior of connecting to a network.
 
-Legacy boards advocates that unlocking IFD regions and ME could permit ME to be modified. While it is true, the non-removable parts of ME (BUP and/or ROMP) are signed together and verified per ME coproocessor prior of permitting the platform to boot. Consequently, removing the nasty parts of ME and providing an unlocked IFD and baked GBE was the chosen path for *Maximized* boards. It is still possible for advanced users to decide to relock the IFD regions prior of flashing maximized boards, while this path would be manual and complexify future internal upgrades. Actually provided Maximized boards take into consideration that the whole SPI flash chip is internally flashable, which would result in flashrom complaining on next internal upgrades. It is still also possible for advanced users to override Heads internally kept configuration to replace the *FLASHROM_OPTIONS* statement to specify manually the IFD defined specific sections to flash : `--ifd --image bios --image ME` etc
+Legacy boards advocates that unlocking IFD regions and ME could permit ME to be modified. While it is true, the non-removable parts of ME (BUP and/or ROMP) are signed together and verified per ME coproocessor prior of permitting the platform to boot. Consequently, removing the nasty parts of ME and providing an unlocked IFD and baked GBE was the chosen path for *Maximized* boards. It is still possible for advanced users to decide to relock the IFD regions prior of flashing maximized boards, while this path would be manual and complexify future internal upgrades. Actually provided Maximized boards take into consideration that the whole SPI flash chip is internally flashable, which would result in flashrom complaining on next internal upgrades. It is still also possible for advanced users to override Heads internally kept configuration to replace the *FLASHROM_OPTIONS* statement to specify manually the image sections to flash (example tool flags: `--image bios --image ME` or `-i bios -i ME`, tool syntax varies).
 
 Current Legacy boards
 ---
@@ -125,7 +147,7 @@ If coming from Skulls or Heads Legacy board configurations while having unlocked
 Having a full xxxx-hotp-maximized or xxxx-maximized board config produced ROM available on a USB stick, alongside with your USB Security dongle's matching exported public key, do the following:
 ```
 mount-usb
-flashrom -p internal -w /media/PathToMaximizedRom.rom
+sudo flashrom --programmer internal --write /media/PathToMaximizedRom.rom
 ```
 On next reboot, Heads will guide you into factory resetting your USB Security dongle or import your previously generated public key matching your USB Security dongle's private key. 
 
