@@ -23,21 +23,22 @@ Generic OS Installation
 Insert OS installation media into one of the USB3 ports (blue on Thinkpads).
 
 Heads boot process supports booting from any ISO file on USB drives formatted with 
-ext3, ext4, exfat, or fat32 filesystems. ISOs can be placed in any directory, not 
-just the root directory. For [certain OSes with trusted keys](https://github.com/osresearch/heads/tree/master/initrd/etc/distro/keys),
+ext3, ext4, exFat, or fat32 filesystems. ISOs can be placed in any directory, not 
+just the root directory. For distributions with detached signed ISOs that have their 
+[signing keys included with Heads](https://github.com/osresearch/heads/tree/master/initrd/etc/distro/keys),
 you can also provide detached signatures for additional verification.
 
 **Filesystem Support and Limitations:**
 - **fat32**: Maximum 4GB file size, readable by all operating systems
 - **ext3/ext4**: No file size limit, but not readable by Windows (only macOS/Linux)
-- **exfat**: No file size limit, but not all OSes can continue booting if the underlying filesystem is exfat
+- **exFat**: No file size limit, but not all OSes can continue booting if the underlying filesystem is exFat
 
 **Linux Distribution Requirements:**
-- Distribution must support ExFAT in its initramfs to boot from exfat filesystems
+- Distribution must support exFat in its initramfs to boot from exFat filesystems
 - Distribution must support efifb (EFI framebuffer) in its initramfs for proper display
 
 **Troubleshooting:**
-- If a distribution doesn't boot from exfat but boots from ext4: report this as a bug to the distribution maintainers
+- If a distribution doesn't boot from exFat but boots from ext4: report this as a bug to the distribution maintainers
 - If a distribution has display issues during boot: setup a TPM Disk Unlock Key when prompted by selecting "boot options" -> "show boot options", selecting an entry, and accepting it as the default
 
 On a supported filesystem, you can place ISO files in any directory structure:
@@ -50,10 +51,10 @@ On a supported filesystem, you can place ISO files in any directory structure:
 /tails-amd64-3.7.iso.sig
 
 # Subdirectories:
-/linux-distros/Qubes-R4.0-x86_64.iso
-/linux-distros/Qubes-R4.0-x86_64.iso.asc
-/operating-systems/tails/tails-amd64-3.7.iso
-/operating-systems/tails/tails-amd64-3.7.iso.sig
+/ISO/LiveCD/tails-amd64-version.iso
+/ISO/LiveCD/tails-amd64-version.iso.sig
+/ISO/Installation/Qubes-Rversion-x86_64.iso
+/ISO/Installation/Qubes-Rversion-x86_64.iso.asc
 ```
 
 **Note**: Detached signatures (`.asc` or `.sig` files) are optional but recommended 
@@ -130,14 +131,14 @@ Key was sealed when booting from detached signed default boot option selection.
 
 This should work for Qubes OS, Fedora, Debian (and derivatives).
 
-Installing Qubes 4.X
+Booting LiveCD/ Installation Media/ Qubes OS
 ===
 Qubes OS and Tails (and any other OS) can boot directly from ISO files. When 
 detached signatures (iso.asc or iso.sig) are provided alongside the ISO, Heads 
 will validate both integrity and authenticity using the distribution signing keys 
 provided with Heads before booting.
 
-Plug in a USB stick formatted with ext3/ext4/exfat/fat32 containing your ISO files 
+Plug in a USB stick formatted with ext3/ext4/exFat/fat32 containing your ISO files 
 into one of the USB ports and boot from USB mode:
 
 ![1-Heads-Options](https://user-images.githubusercontent.com/827570/156627927-7239a936-e7b1-4ffb-9329-1c422dc70266.jpeg)
