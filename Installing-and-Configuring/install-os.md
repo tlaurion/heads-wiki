@@ -60,6 +60,8 @@ On a supported filesystem, you can place ISO files in any directory structure:
 **Note**: Detached signatures (`.asc` or `.sig` files) are optional but recommended 
 for additional verification when available for your distribution.
 
+Detached signatures became optional with [pull request #1984](https://github.com/linuxboot/heads/pull/1984) merged on 2024-07-27. If your version of Heads is older than this commit, you will need to prepare a USB thumb drive per linux distribution instructions (dd or equivalent), or detach sign that iso with your USB Security dongle, see below (For additional security...).
+
 - Some distros will require additional options to boot directly from ISO. See
 	[Boot config files](/BootOptions) for more information.
 - Boot from USB by Boot menu options, or by calling `usb-scan` from the recovery
