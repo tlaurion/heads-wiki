@@ -171,23 +171,27 @@ equivalent to the login password. Other operating systems might differ.
 
 ![TPM]({{ site.baseurl }}/images/TPM.jpg)
 
-0: Nothing for the moment (Populated by binary blobs where applicable for
-[SRTM](https://doc.coreboot.org/security/vboot/measured_boot.html#ibb-crtm))
+0: Not used. Would be populated by Intel Boot Guard (IBB via ACM) if
+enabled.
 
-1: Nothing for the moment
+1: Not used. Would be populated by coreboot with HWID digest and boot mode
+(`CONFIG_PCR_HWID`, `CONFIG_PCR_BOOT_MODE`) but runtime shows zero.
 
-2: coreboot's Boot block, ROM stage, RAM stage, Payload (Heads linux kernel and
-initrd)
+2: [coreboot measured boot](https://doc.coreboot.org/security/vboot/measured_boot.html#platform-configuration-registers)
+— bootblock, romstage, ramstage, payload, bootsplash.jpg, fallback/*.
 
-3: Nothing for the moment
+3: Runtime data slot — empty on all Heads builds. Coreboot can measure MRC
+cache and hwinfo.hex here (DIMM-swap detection), currently disabled.
 
-4: Boot mode (0 during `/init`, then `recovery` or `normal-boot`)
+4: Boot mode. Extended by `usb-init.sh`, `kexec-insert-key.sh`,
+`kexec-select-boot.sh`.
 
-5: Heads Linux kernel modules
+5: Kernel modules. Extended by `sbin/insmod.sh`.
 
-6: Drive LUKS headers
+6: LUKS headers. Extended by `qubes-measure-luks.sh` during DUK seal.
 
-7: Heads user-specific files stored in CBFS (config.user, GPG keyring, etc).
+7: Heads CBFS files and UEFI binaries. Extended by `cbfs-init.sh`,
+`uefi-init.sh`.
 
 (16): Used for TPM futurecalc of LUKS header when setting up a TPM disk
 encryption key
@@ -224,6 +228,11 @@ types a [TPM Disk Unlock key passphrase]({{ site.baseurl }}/Keys/#disk-unlock-ke
 Indeed, the PCRs measurements used to seal the Disk Unlock Key in TPM NV memory
 cannot unseal that secret, even with a good TPM Disk Unlock Key passphrase,
 while HOTP/TOTP should not be able to unseal either.
+
+Unseal can also fail due to TPM Dictionary Attack Lockout after too many failed
+authentication attempts. Heads sets a 10-try limit with 1-hour recovery during
+TPM reset. Pending: [PR #2124](https://github.com/linuxboot/heads/pull/2124)
+adds user-facing DA lockout detection and guidance.
 
 ### TCPA Event log
 From the [Recovery Shell]({{ site.baseurl }}/RecoveryShell/), it is possible to review PCR2 [TCPA event
