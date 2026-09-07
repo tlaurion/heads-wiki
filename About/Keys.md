@@ -230,9 +230,11 @@ cannot unseal that secret, even with a good TPM Disk Unlock Key passphrase,
 while HOTP/TOTP should not be able to unseal either.
 
 Unseal can also fail due to TPM Dictionary Attack Lockout after too many failed
-authentication attempts. Heads sets a 10-try limit with 1-hour recovery during
-TPM reset. Pending: [PR #2124](https://github.com/linuxboot/heads/pull/2124)
-adds user-facing DA lockout detection and guidance.
+authentication attempts. On TPM 2, Heads enforces a 10-try limit with 1-hour
+recovery during TPM reset. On TPM 1, DA behavior is vendor-specific — Heads
+has no tooling to configure it. Pending:
+[PR #2124](https://github.com/linuxboot/heads/pull/2124) adds user-facing DA
+lockout detection and guidance.
 
 ### TCPA Event log
 From the [Recovery Shell]({{ site.baseurl }}/RecoveryShell/), it is possible to review PCR2 [TCPA event
